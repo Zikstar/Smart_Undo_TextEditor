@@ -74,6 +74,14 @@ public class FileManager {
         }
     }
 
+    public static void saveFileAs(){
+        //Todo: Implement
+    }
+
+    public static void renameFile(){
+        //Todo: Implement
+    }
+
     public static void Quit(){
         System.exit(0);
     }

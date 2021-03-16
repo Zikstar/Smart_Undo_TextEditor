@@ -50,20 +50,34 @@ public class SmartUndoEditorGUI extends JFrame implements ActionListener{
 
         // Set the look-and-feel (LNF) of the application
         // Try to default to whatever the host system prefers
-        try {
-            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException ex) {
-            Logger.getLogger(SmartUndoEditorGUI.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        setTheLookAndFeel();
 
         // Set attributes of the app window
+        setTheAttrOfAppWindow();
+
+        // Build the menu
+        JMenuBar menu_main = buildTheMenu();
+
+        frame.setJMenuBar(menu_main);
+    }
+
+    private void setTheAttrOfAppWindow() {
         area = new JTextArea();
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.add(area);
         frame.setSize(640, 480);
         frame.setVisible(true);
+    }
 
-        // Build the menu
+    private void setTheLookAndFeel() {
+        try {
+            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException ex) {
+            Logger.getLogger(SmartUndoEditorGUI.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    private JMenuBar buildTheMenu() {
         JMenuBar menu_main = new JMenuBar();
 
         JMenu menu_file = new JMenu("File");
@@ -89,7 +103,6 @@ public class SmartUndoEditorGUI extends JFrame implements ActionListener{
         menu_file.add(menuitem_open);
         menu_file.add(menuitem_save);
         menu_file.add(menuitem_quit);
-
-        frame.setJMenuBar(menu_main);
+        return menu_main;
     }
 }
