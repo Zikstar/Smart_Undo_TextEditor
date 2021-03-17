@@ -1,6 +1,12 @@
 package com.mapledev.GUI;
 
-public class HomePageGUI {
+import javax.swing.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+public class HomePageGUI extends JFrame implements ActionListener {
     public HomePageGUI(){
 
     }
@@ -9,15 +15,38 @@ public class HomePageGUI {
 
     }
 
-    private void openNewFile(){
+//    This should all be handled by FileManagement component
+//
+//    private void openNewFile(){
+//
+//    }
+//
+//    private void openExistingFile(){
+//
+//    }
+//
+//    private void openMostRecentFile(){
+//
+//    }
+
+    private void setTheAttrOfAppWindow() {
 
     }
 
-    private void openExistingFile(){
+    private void setTheLookAndFeel() {
+        try {
+            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException ex) {
+            Logger.getLogger(SmartUndoEditorGUI.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    private void displayActionIconsAndText(){
 
     }
 
-    private void openMostRecentFile(){
+    @Override
+    public void actionPerformed(ActionEvent actionEvent) {
 
     }
 }
