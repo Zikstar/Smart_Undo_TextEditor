@@ -103,6 +103,38 @@ public class SmartUndoEditorGUI extends JFrame implements ActionListener{
         menu_file.add(menuitem_open);
         menu_file.add(menuitem_save);
         menu_file.add(menuitem_quit);
+        
+        // Menu items for Insert
+        
+        JMenuItem menuitem_picture = new JMenuItem("Picture");
+        JMenuItem menuitem_table = new JMenuItem("Table");
+        JMenuItem menuitem_header = new JMenuItem("Header");
+        JMenuItem menuitem_footer = new JMenuItem("Footer");
+        
+
+        menuitem_picture.addActionListener(this);
+        menuitem_table.addActionListener(this);
+        menuitem_header.addActionListener(this);
+        menuitem_footer.addActionListener(this);
+
+        menu_main.add(menu_insert);
+
+        menu_insert.add(menuitem_picture);
+        menu_insert.add(menuitem_table);
+        menu_insert.add(menuitem_header);
+        menu_insert.add(menuitem_footer);
+        
+        // Menu items for edit
+  
+        JMenuItem menuitem_undo = new JMenuItem("Undo");
+        
+        menuitem_undo.addActionListener(this);
+
+        menu_main.add(menu_edit);
+
+        menu_edit.add(menuitem_undo);
         return menu_main;
+        
+        
     }
 }
