@@ -23,8 +23,8 @@ public class EditManager {
 
     }
 
-    public static void paste(){
-
+    public static boolean paste(){
+        return false;
     }
 
     public static void handleUndo(UndoType undoType){
