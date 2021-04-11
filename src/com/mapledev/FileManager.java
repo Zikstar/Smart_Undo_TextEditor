@@ -13,6 +13,8 @@ import javax.swing.filechooser.FileSystemView;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -24,21 +26,27 @@ import java.util.logging.Logger;
 
 public class FileManager {
     private static int returnValue = 0;
-
+    static Boolean opened = false;
+    public static Boolean openedTemp = false;
+    public static Boolean changed = false;
+    static JFileChooser jfctemp = new JFileChooser(FileSystemView.getFileSystemView().getHomeDirectory());
     public FileManager(){
-
     }
 
 
     public static String openFile(){
-        String ingest = null;
+        String ingest = "";
         JFileChooser jfc = new JFileChooser(FileSystemView.getFileSystemView().getHomeDirectory());
+
         jfc.setDialogTitle("Choose destination.");
         jfc.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
 
         returnValue = jfc.showOpenDialog(null);
         if (returnValue == JFileChooser.APPROVE_OPTION) {
             File f = new File(jfc.getSelectedFile().getAbsolutePath());
+            jfctemp.setSelectedFile(jfc.getSelectedFile());
+            opened = true;
+            openedTemp = true;
             try {
                 FileReader read = new FileReader(f);
                 Scanner scan = new Scanner(read);
@@ -55,16 +63,14 @@ public class FileManager {
     }
 
     public static void saveFile(JTextArea area){
-        JFileChooser jfc = new JFileChooser(FileSystemView.getFileSystemView().getHomeDirectory());
-        jfc.setDialogTitle("Choose destination.");
-        jfc.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
-
-        returnValue = jfc.showSaveDialog(null);
+    	if (!opened) 
+    		saveFileAs(area);
         try {
-            File f = new File(jfc.getSelectedFile().getAbsolutePath());
+            File f = new File(jfctemp.getSelectedFile().getAbsolutePath());
             FileWriter out = new FileWriter(f);
-            out.write(area.getText());
+            area.write(out);
             out.close();
+            changed = false;
         } catch (FileNotFoundException ex) {
             Component f = null;
             JOptionPane.showMessageDialog(f,"File not found.");
@@ -72,17 +78,77 @@ public class FileManager {
             Component f = null;
             JOptionPane.showMessageDialog(f,"Error.");
         }
+        
     }
 
-    public static void saveFileAs(){
-        //Todo: Implement
+    public static void saveFileAs(JTextArea area){
+    	final JFileChooser jfc = new JFileChooser(FileSystemView.getFileSystemView().getHomeDirectory())
+        {
+            public void approveSelection()
+            {
+                if (getSelectedFile().exists())
+                {
+                    int n = JOptionPane.showConfirmDialog(
+                        this,
+                        "Do You Want to Overwrite File?",
+                        "Confirm Overwrite",
+                        JOptionPane.YES_NO_OPTION);
+
+                    if (n == JOptionPane.YES_OPTION)
+                        super.approveSelection();
+
+                }
+                else
+                    super.approveSelection();
+            }
+        };
+        jfc.setDialogTitle("Choose destination");
+        jfc.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
+        jfc.setMultiSelectionEnabled(false);
+
+        jfc.setSelectedFile( new File("") );
+        int returnVal = jfc.showSaveDialog(null);
+
+
+        if(returnVal == JFileChooser.APPROVE_OPTION)
+        {
+        	try(FileWriter fw = new FileWriter(jfc.getSelectedFile())) {
+        	    area.write(fw);
+        	    changed = false;
+        	}catch (FileNotFoundException ex) {
+                Component f = null;
+                JOptionPane.showMessageDialog(f,"File not found.");
+            } catch (IOException ex) {
+                Component f = null;
+                JOptionPane.showMessageDialog(f,"Error.");
+            }
+        }
+        else {
+        	System.out.println("Exited");
+        }
     }
 
     public static void renameFile(){
-        //Todo: Implement
+        
     }
+    
 
-    public static void Quit(){
+    public static void Quit(JTextArea area){
+    	if (changed) {
+    		int n = JOptionPane.showConfirmDialog(
+                    null,
+                    "Unsaved changes, do you wish to save?",
+                    "Confirm Overwrite",
+                    JOptionPane.YES_NO_OPTION);
+
+                if (n == JOptionPane.YES_OPTION)
+                	if (opened) {
+                		saveFile(area);
+                	} else {
+                		saveFileAs(area);
+                	}
+    	}
         System.exit(0);
     }
+    
 }
