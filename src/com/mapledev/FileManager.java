@@ -7,6 +7,7 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JTextArea;
+import javax.swing.JTextPane;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.filechooser.FileSystemView;
@@ -29,6 +30,7 @@ public class FileManager {
     static Boolean opened = false;
     public static Boolean openedTemp = false;
     public static Boolean changed = false;
+    private static Boolean saveSuccess = false;
     static JFileChooser jfctemp = new JFileChooser(FileSystemView.getFileSystemView().getHomeDirectory());
     public FileManager(){
     }
@@ -51,9 +53,13 @@ public class FileManager {
                 FileReader read = new FileReader(f);
                 Scanner scan = new Scanner(read);
                 while (scan.hasNextLine()) {
-                    String line = scan.nextLine() + "\n";
+                    String line = scan.nextLine();
+                    if (scan.hasNextLine()) {
+                    	line = line + "\n";
+                    }
                     ingest = ingest + line;
                 }
+                
                 return ingest;
             } catch (FileNotFoundException ex) {
                 ex.printStackTrace();
@@ -62,7 +68,7 @@ public class FileManager {
         return "";
     }
 
-    public static void saveFile(JTextArea area){
+    public static void saveFile(JTextPane area){
     	if (!opened) 
     		saveFileAs(area);
         try {
@@ -71,18 +77,22 @@ public class FileManager {
             area.write(out);
             out.close();
             changed = false;
+            saveSuccess = true;
         } catch (FileNotFoundException ex) {
+        	saveSuccess = false;
             Component f = null;
             JOptionPane.showMessageDialog(f,"File not found.");
         } catch (IOException ex) {
+        	saveSuccess = false;
             Component f = null;
             JOptionPane.showMessageDialog(f,"Error.");
         }
         
     }
 
-    public static void saveFileAs(JTextArea area){
-    	final JFileChooser jfc = new JFileChooser(FileSystemView.getFileSystemView().getHomeDirectory())
+    public static void saveFileAs(JTextPane area){
+    	@SuppressWarnings("serial")
+		final JFileChooser jfc = new JFileChooser(FileSystemView.getFileSystemView().getHomeDirectory())
         {
             public void approveSelection()
             {
@@ -122,9 +132,10 @@ public class FileManager {
                 Component f = null;
                 JOptionPane.showMessageDialog(f,"Error.");
             }
+        	saveSuccess = true;
         }
         else {
-        	System.out.println("Exited");
+        	saveSuccess = false;
         }
     }
 
@@ -133,22 +144,28 @@ public class FileManager {
     }
     
 
-    public static void Quit(JTextArea area){
+    public static void Quit(JTextPane area, JFrame frame){
     	if (changed) {
     		int n = JOptionPane.showConfirmDialog(
-                    null,
+                    frame,
                     "Unsaved changes, do you wish to save?",
-                    "Confirm Overwrite",
+                    "Confirm Exit",
                     JOptionPane.YES_NO_OPTION);
-
-                if (n == JOptionPane.YES_OPTION)
+    			
+                if (n == JOptionPane.YES_OPTION) {
                 	if (opened) {
                 		saveFile(area);
                 	} else {
                 		saveFileAs(area);
                 	}
-    	}
-        System.exit(0);
+                	if (!saveSuccess) {
+                		return;
+                	}
+                } else if (n == JOptionPane.CLOSED_OPTION) {
+                	return;
+                }
+    	} 
+    	System.exit(0);
     }
     
 }
