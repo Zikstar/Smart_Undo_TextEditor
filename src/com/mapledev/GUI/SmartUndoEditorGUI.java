@@ -1,22 +1,29 @@
 package com.mapledev.GUI;
 
+import com.mapledev.EditManager;
 import com.mapledev.FileManager;
 
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
-import javax.swing.JTextArea;
+import javax.swing.JPopupMenu;
+import javax.swing.JTextPane;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 
 public class SmartUndoEditorGUI extends JFrame implements ActionListener{
-    private static JTextArea area;
+    private static JTextPane area;
     private static JFrame frame;
 
     public SmartUndoEditorGUI(){
@@ -31,41 +38,60 @@ public class SmartUndoEditorGUI extends JFrame implements ActionListener{
         if(actionCommand.equals("Open")){
             String ingestText = FileManager.openFile();
             area.setText(ingestText);
+            area.setCaretPosition(0);
         }else if (actionCommand.equals("Save")) {
-            //Won't work unless you choose an actual text file, so
-            //have to create SaveAs method
             FileManager.saveFile(area);
+        }else if (actionCommand.equals("Save as")) {
+            FileManager.saveFileAs(area);
         } else if (actionCommand.equals("New")) {
             area.setText("");
         } else if (actionCommand.equals("Quit")) {
-            FileManager.Quit();
+            FileManager.Quit(area, frame);
+        } else if (actionCommand.contentEquals("Copy")) {
+        	EditManager.copy(area);
+        	
+        } else if (actionCommand.contentEquals("Cut")) {
+        	EditManager.cut(area);
+        	
+        } else if (actionCommand.contentEquals("Paste")) {
+        	EditManager.paste(area);
+        	
+        } else if (actionCommand.contentEquals("Undo")) {
+        	
         }
-
     }
 
 
 
     public void run() {
         frame = new JFrame("Smart Undo TextEditor");
-
+        frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+        
+        frame.addWindowListener(new WindowAdapter() {
+            public void windowClosing(WindowEvent we) {
+                FileManager.Quit(area, frame);
+              }
+        });
+         
         // Set the look-and-feel (LNF) of the application
         // Try to default to whatever the host system prefers
         setTheLookAndFeel();
-
-        // Set attributes of the app window
-        setTheAttrOfAppWindow();
 
         // Build the menu
         JMenuBar menu_main = buildTheMenu();
 
         frame.setJMenuBar(menu_main);
+        
+     // Set attributes of the app window
+        setTheAttrOfAppWindow();
     }
 
     private void setTheAttrOfAppWindow() {
-        area = new JTextArea();
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        area = new JTextPane();
+        area.getDocument().addDocumentListener(new MyDocumentListener());
         frame.add(area);
         frame.setSize(640, 480);
+        frame.setLocationRelativeTo(null);
         frame.setVisible(true);
     }
 
@@ -95,6 +121,7 @@ public class SmartUndoEditorGUI extends JFrame implements ActionListener{
         menuitem_new.addActionListener(this);
         menuitem_open.addActionListener(this);
         menuitem_save.addActionListener(this);
+        menuitem_save_as.addActionListener(this);
         menuitem_quit.addActionListener(this);
 
         menu_main.add(menu_file);
@@ -102,6 +129,7 @@ public class SmartUndoEditorGUI extends JFrame implements ActionListener{
         menu_file.add(menuitem_new);
         menu_file.add(menuitem_open);
         menu_file.add(menuitem_save);
+        menu_file.add(menuitem_save_as);
         menu_file.add(menuitem_quit);
         
         // Menu items for Insert
@@ -127,14 +155,41 @@ public class SmartUndoEditorGUI extends JFrame implements ActionListener{
         // Menu items for edit
   
         JMenuItem menuitem_undo = new JMenuItem("Undo");
+        JMenuItem menuitem_copy = new JMenuItem("Copy");
+        JMenuItem menuitem_cut = new JMenuItem("Cut");
+        JMenuItem menuitem_paste = new JMenuItem("Paste");
         
         menuitem_undo.addActionListener(this);
+        menuitem_copy.addActionListener(this);
+        menuitem_cut.addActionListener(this);
+        menuitem_paste.addActionListener(this);
 
         menu_main.add(menu_edit);
-
         menu_edit.add(menuitem_undo);
+        menu_edit.add(menuitem_copy);
+        menu_edit.add(menuitem_cut);
+        menu_edit.add(menuitem_paste);
+     
         return menu_main;
         
         
+    }
+    
+    class MyDocumentListener implements DocumentListener {
+        String newline = "\n";
+     
+        public void insertUpdate(DocumentEvent e) {
+        	if (FileManager.openedTemp) {
+        		FileManager.openedTemp = false;
+        	} else {
+        		FileManager.changed = true;
+        	}
+        }
+        public void removeUpdate(DocumentEvent e) {
+        	FileManager.changed = true;
+        }
+        public void changedUpdate(DocumentEvent e) {
+        	FileManager.changed = true;
+        }
     }
 }
