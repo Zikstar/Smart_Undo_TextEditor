@@ -2,6 +2,8 @@ package com.mapledev.GUI;
 
 import com.mapledev.EditManager;
 import com.mapledev.FileManager;
+import java.awt.BorderLayout;
+import java.awt.Dimension;
 
 import javax.swing.JFrame;
 import javax.swing.JMenu;
@@ -18,13 +20,35 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.Action;
+import javax.swing.BorderFactory;
+import javax.swing.JScrollPane;
+import javax.swing.JSplitPane;
+import javax.swing.JTextArea;
+import javax.swing.event.UndoableEditEvent;
+import javax.swing.event.UndoableEditListener;
+import javax.swing.text.AbstractDocument;
+import javax.swing.text.Document;
+import javax.swing.text.JTextComponent;
+import javax.swing.text.StyledDocument;
 
 
 public class SmartUndoEditorGUI extends JFrame implements ActionListener{
     private static JTextPane area;
     private static JFrame frame;
+    AbstractDocument doc;
+    JTextArea changeLog;
+    String newline = "\n";
+    
+    protected EditManager um = new EditManager(this);
+    public EditManager.UndoAction undoAction;
+    public EditManager.RedoAction redoAction;
+    HashMap<Object, Action> actions;
+    JScrollPane scrollPane, scrollPaneForLog;
+    JSplitPane splitPane;
 
     public SmartUndoEditorGUI(){
         run();
@@ -56,9 +80,8 @@ public class SmartUndoEditorGUI extends JFrame implements ActionListener{
         } else if (actionCommand.contentEquals("Paste")) {
         	EditManager.paste(area);
         	
-        } else if (actionCommand.contentEquals("Undo")) {
-        	
-        }
+        } 
+       
     }
 
 
@@ -93,6 +116,8 @@ public class SmartUndoEditorGUI extends JFrame implements ActionListener{
         frame.setSize(640, 480);
         frame.setLocationRelativeTo(null);
         frame.setVisible(true);
+        
+        addListeners();
     }
 
     private void setTheLookAndFeel() {
@@ -153,19 +178,24 @@ public class SmartUndoEditorGUI extends JFrame implements ActionListener{
         menu_insert.add(menuitem_footer);
         
         // Menu items for edit
+        undoAction = um.new UndoAction();
+        menu_edit.add(undoAction);
+        
+        redoAction = um.new RedoAction();
+        menu_edit.add(redoAction);
   
-        JMenuItem menuitem_undo = new JMenuItem("Undo");
+        //JMenuItem menuitem_undo = new JMenuItem("Undo");
         JMenuItem menuitem_copy = new JMenuItem("Copy");
         JMenuItem menuitem_cut = new JMenuItem("Cut");
         JMenuItem menuitem_paste = new JMenuItem("Paste");
         
-        menuitem_undo.addActionListener(this);
+        //menuitem_undo.addActionListener(this);
         menuitem_copy.addActionListener(this);
         menuitem_cut.addActionListener(this);
         menuitem_paste.addActionListener(this);
 
         menu_main.add(menu_edit);
-        menu_edit.add(menuitem_undo);
+        //menu_edit.add(menuitem_undo);
         menu_edit.add(menuitem_copy);
         menu_edit.add(menuitem_cut);
         menu_edit.add(menuitem_paste);
@@ -192,4 +222,33 @@ public class SmartUndoEditorGUI extends JFrame implements ActionListener{
         	FileManager.changed = true;
         }
     }
+
+    
+    private HashMap<Object, Action> createActionTable(JTextComponent textComponent) {
+        HashMap<Object, Action> actions = new HashMap<Object, Action>();
+        Action[] actionsArray = textComponent.getActions();
+        for (Action a : actionsArray) {
+            actions.put(a.getValue(Action.NAME), a);
+        }
+        return actions;
+    }
+    
+    private Action getActionByName(String name) {
+        return actions.get(name);
+    }
+    
+    public void addListeners(){
+        area.getDocument().addUndoableEditListener(new MyUndoableEditListener());
+        area.getDocument().addDocumentListener(new MyDocumentListener());
+    }
+
+    public class MyUndoableEditListener implements UndoableEditListener {
+        public void undoableEditHappened(UndoableEditEvent e) {
+            um.addEdit(e.getEdit());
+            undoAction.updateUndoState();
+            redoAction.updateRedoState();
+        }
+    }
+   
+   
 }
