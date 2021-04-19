@@ -25,8 +25,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.Action;
 import javax.swing.BorderFactory;
-import javax.swing.JScrollPane;
-import javax.swing.JSplitPane;
 import javax.swing.JTextArea;
 import javax.swing.event.UndoableEditEvent;
 import javax.swing.event.UndoableEditListener;
@@ -39,17 +37,11 @@ import javax.swing.text.StyledDocument;
 public class SmartUndoEditorGUI extends JFrame implements ActionListener{
     private static JTextPane area;
     private static JFrame frame;
-    AbstractDocument doc;
-    JTextArea changeLog;
-    String newline = "\n";
-    
     protected EditManager um = new EditManager(this);
     public EditManager.UndoAction undoAction;
     public EditManager.RedoAction redoAction;
     HashMap<Object, Action> actions;
-    JScrollPane scrollPane, scrollPaneForLog;
-    JSplitPane splitPane;
-
+    
     public SmartUndoEditorGUI(){
         run();
     }
@@ -231,10 +223,6 @@ public class SmartUndoEditorGUI extends JFrame implements ActionListener{
             actions.put(a.getValue(Action.NAME), a);
         }
         return actions;
-    }
-    
-    private Action getActionByName(String name) {
-        return actions.get(name);
     }
     
     public void addListeners(){

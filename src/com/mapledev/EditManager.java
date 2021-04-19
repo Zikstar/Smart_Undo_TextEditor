@@ -14,8 +14,6 @@ public class EditManager extends UndoManager{
 	
 	private static String copiedText;
 
-    //Todo: Actually implement all of this
-
     public EditManager(SmartUndoEditorGUI gui) {
         super();
         this.gui = gui;
