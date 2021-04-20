@@ -1,22 +1,22 @@
 package com.mapledev;
 
+import com.mapledev.GUI.SmartUndoEditorGUI;
+import java.awt.event.ActionEvent;
+import javax.swing.AbstractAction;
+import javax.swing.Action;
 import javax.swing.JTextPane;
+import javax.swing.undo.CannotRedoException;
+import javax.swing.undo.CannotUndoException;
+import javax.swing.undo.UndoManager;
 
-public class EditManager {
+public class EditManager extends UndoManager{
+    SmartUndoEditorGUI gui;
 	
 	private static String copiedText;
 
-    //Todo: Actually implement all of this
-    public enum UndoType{
-
-    }
-
-    public enum DeleteType{
-
-    }
-
-    public EditManager(){
-
+    public EditManager(SmartUndoEditorGUI gui) {
+        super();
+        this.gui = gui;
     }
 
     public static void cut(JTextPane content){
@@ -49,12 +49,60 @@ public class EditManager {
     	} else
     		return false;
     }
+    
+    public class UndoAction extends AbstractAction {
+        public UndoAction() {
+            super("Undo");
+            setEnabled(false);
+        }
 
-    public static void handleUndo(UndoType undoType){
+        public void actionPerformed(ActionEvent e) {
+            try {
+                undo();
+            } catch (CannotUndoException ex) {
+                System.out.println("Unable to undo: " + ex);
+                ex.printStackTrace();
+            }
+            updateUndoState();
+            gui.redoAction.updateRedoState();
+        }
 
+        public void updateUndoState(){
+            if (canUndo()) {
+                setEnabled(true);
+                putValue(Action.NAME, getUndoPresentationName());
+            } else {
+                setEnabled(false);
+                putValue(Action.NAME, "Undo");
+            }
+        }
     }
+    
+    public class RedoAction extends AbstractAction {
+        public RedoAction() {
+            super("Redo");
+            setEnabled(false);
+        }
 
-    public static void handleDelete(DeleteType deleteType){
+        public void actionPerformed(ActionEvent e) {
+            try {
+                redo();
+            } catch (CannotRedoException ex) {
+                System.out.println("Unable to redo: " + ex);
+                ex.printStackTrace();
+            }
+            updateRedoState();
+            gui.undoAction.updateUndoState();
+        }
 
+        public void updateRedoState() {
+            if (canRedo()) {
+                setEnabled(true);
+                putValue(Action.NAME, getRedoPresentationName());
+            } else {
+                setEnabled(false);
+                putValue(Action.NAME, "Redo");
+            }
+        }
     }
 }
