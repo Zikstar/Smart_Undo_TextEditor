@@ -34,7 +34,9 @@ public class SmartUndoEditorGUI extends JFrame implements ActionListener{
     public EditManager.RedoAction redoAction;
     HashMap<Object, Action> actions;
     private JList<String> jList;
-    
+    private JMenuItem menuitem_redolist;
+
+
     public SmartUndoEditorGUI(){
         run();
     }
@@ -54,6 +56,7 @@ public class SmartUndoEditorGUI extends JFrame implements ActionListener{
             FileManager.saveFileAs(area);
         } else if (actionCommand.equals("New")) {
             area.setText("");
+            EditManager.setOldList(null);
         } else if (actionCommand.equals("Quit")) {
             FileManager.Quit(area, frame);
         } else if (actionCommand.contentEquals("Copy")) {
@@ -65,8 +68,13 @@ public class SmartUndoEditorGUI extends JFrame implements ActionListener{
         } else if (actionCommand.contentEquals("Paste")) {
         	EditManager.paste(area);
         } else if (actionCommand.contentEquals("Undo From List")){
-            showUndoListDialog(EditManager.undoFromList(area));
-
+            showUndoListDialog("Choose the words you want to undo",
+                    EditManager.undoFromList(area));
+        }else if (actionCommand.contentEquals("Redo From List(1 Step)")){
+            rollBackToOldWordList();
+        }else if(actionCommand.contentEquals("Delete From List")){
+            showUndoListDialog("Choose the words you want to delete",
+                    EditManager.deleteFromList(area));
         }
        
     }
@@ -111,11 +119,11 @@ public class SmartUndoEditorGUI extends JFrame implements ActionListener{
         addListeners();
     }
 
-    private void showUndoListDialog(String[] words){
+    private void showUndoListDialog(String message, String[] words){
         if(words == null)
             return;
-        String message = "Choose the words you want to undo";
 
+        menuitem_redolist.setEnabled(true);
         jList = new JList<>(words);
         ListDialog dialog = new ListDialog(message, jList);
         dialog.setOnOk(e ->{
@@ -144,6 +152,18 @@ public class SmartUndoEditorGUI extends JFrame implements ActionListener{
         area.setText(String.join(" ", newWordList));
     }
 
+    private void rollBackToOldWordList(){
+        //You can only go one step back
+        //Do only if available
+        if(EditManager.getOldWordList() == null){
+            menuitem_redolist.setEnabled(false);
+        }else {
+            menuitem_redolist.setEnabled(true);
+            area.setText(String.join(" ", EditManager.getOldWordList()));
+        }
+
+    }
+
     private void setTheLookAndFeel() {
         try {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
@@ -156,7 +176,7 @@ public class SmartUndoEditorGUI extends JFrame implements ActionListener{
         JMenuBar menu_main = new JMenuBar();
 
         JMenu menu_file = new JMenu("File");
-        JMenu menu_insert = new JMenu("Insert");
+        //JMenu menu_insert = new JMenu("Insert");
         JMenu menu_edit = new JMenu("Edit");
 
         //Menu Items for File
@@ -194,12 +214,16 @@ public class SmartUndoEditorGUI extends JFrame implements ActionListener{
         JMenuItem menuitem_cut = new JMenuItem("Cut");
         JMenuItem menuitem_paste = new JMenuItem("Paste");
         JMenuItem menuitem_undolist = new JMenuItem("Undo From List");
+        menuitem_redolist = new JMenuItem("Redo From List(1 Step)");
+        JMenuItem menuItem_delete_list = new JMenuItem("Delete From List");
         
         //menuitem_undo.addActionListener(this);
         menuitem_copy.addActionListener(this);
         menuitem_cut.addActionListener(this);
         menuitem_paste.addActionListener(this);
         menuitem_undolist.addActionListener(this);
+        menuitem_redolist.addActionListener(this);
+        menuItem_delete_list.addActionListener(this);
 
         menu_main.add(menu_edit);
         //menu_edit.add(menuitem_undo);
@@ -207,6 +231,8 @@ public class SmartUndoEditorGUI extends JFrame implements ActionListener{
         menu_edit.add(menuitem_cut);
         menu_edit.add(menuitem_paste);
         menu_edit.add(menuitem_undolist);
+        menu_edit.add(menuitem_redolist);
+        menu_edit.add(menuItem_delete_list);
      
         return menu_main;
         

@@ -2,9 +2,7 @@ package com.mapledev;
 
 import com.mapledev.GUI.SmartUndoEditorGUI;
 import java.awt.event.ActionEvent;
-import javax.swing.AbstractAction;
-import javax.swing.Action;
-import javax.swing.JTextPane;
+import javax.swing.*;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 import javax.swing.undo.CannotRedoException;
@@ -15,6 +13,7 @@ public class EditManager extends UndoManager{
     SmartUndoEditorGUI gui;
 	
 	private static String copiedText;
+	private static String[] oldWordList;
 
     public EditManager(SmartUndoEditorGUI gui) {
         super();
@@ -57,12 +56,35 @@ public class EditManager extends UndoManager{
         try {
             String text = document.getText(0, document.getLength());
             String[] WordsArr = text.split("\\s+");
+            oldWordList = WordsArr;
             return WordsArr;
 
         }catch (BadLocationException ble){
             ble.printStackTrace();
         }
         return null;
+    }
+
+    public static String[] deleteFromList(JTextPane area){
+        Document document = area.getDocument();
+        try {
+            String text = document.getText(0, document.getLength());
+            String[] WordsArr = text.split("\\s+");
+            oldWordList = null;
+            return WordsArr;
+
+        }catch (BadLocationException ble){
+            ble.printStackTrace();
+        }
+        return null;
+    }
+
+    public static String[] getOldWordList(){
+        return oldWordList;
+    }
+
+    public static void setOldList(String[] oldList) {
+        oldWordList = oldList;
     }
 
     public class UndoAction extends AbstractAction {
