@@ -15,20 +15,6 @@ public class HomePageGUI extends JFrame implements ActionListener {
 
     }
 
-//    This should all be handled by FileManagement component
-//
-//    private void openNewFile(){
-//
-//    }
-//
-//    private void openExistingFile(){
-//
-//    }
-//
-//    private void openMostRecentFile(){
-//
-//    }
-
     private void setTheAttrOfAppWindow() {
 
     }

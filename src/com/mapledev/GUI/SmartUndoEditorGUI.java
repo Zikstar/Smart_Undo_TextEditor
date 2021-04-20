@@ -37,7 +37,7 @@ import javax.swing.text.StyledDocument;
 public class SmartUndoEditorGUI extends JFrame implements ActionListener{
     private static JTextPane area;
     private static JFrame frame;
-    protected EditManager um = new EditManager(this);
+    protected EditManager editmanager = new EditManager(this);
     public EditManager.UndoAction undoAction;
     public EditManager.RedoAction redoAction;
     HashMap<Object, Action> actions;
@@ -149,45 +149,22 @@ public class SmartUndoEditorGUI extends JFrame implements ActionListener{
         menu_file.add(menuitem_save_as);
         menu_file.add(menuitem_quit);
         
-        // Menu items for Insert
-        
-        JMenuItem menuitem_picture = new JMenuItem("Picture");
-        JMenuItem menuitem_table = new JMenuItem("Table");
-        JMenuItem menuitem_header = new JMenuItem("Header");
-        JMenuItem menuitem_footer = new JMenuItem("Footer");
-        
-
-        menuitem_picture.addActionListener(this);
-        menuitem_table.addActionListener(this);
-        menuitem_header.addActionListener(this);
-        menuitem_footer.addActionListener(this);
-
-        menu_main.add(menu_insert);
-
-        menu_insert.add(menuitem_picture);
-        menu_insert.add(menuitem_table);
-        menu_insert.add(menuitem_header);
-        menu_insert.add(menuitem_footer);
-        
         // Menu items for edit
-        undoAction = um.new UndoAction();
+        undoAction = editmanager.new UndoAction();
         menu_edit.add(undoAction);
         
-        redoAction = um.new RedoAction();
+        redoAction = editmanager.new RedoAction();
         menu_edit.add(redoAction);
   
-        //JMenuItem menuitem_undo = new JMenuItem("Undo");
         JMenuItem menuitem_copy = new JMenuItem("Copy");
         JMenuItem menuitem_cut = new JMenuItem("Cut");
         JMenuItem menuitem_paste = new JMenuItem("Paste");
         
-        //menuitem_undo.addActionListener(this);
         menuitem_copy.addActionListener(this);
         menuitem_cut.addActionListener(this);
         menuitem_paste.addActionListener(this);
 
         menu_main.add(menu_edit);
-        //menu_edit.add(menuitem_undo);
         menu_edit.add(menuitem_copy);
         menu_edit.add(menuitem_cut);
         menu_edit.add(menuitem_paste);
@@ -232,7 +209,7 @@ public class SmartUndoEditorGUI extends JFrame implements ActionListener{
 
     public class MyUndoableEditListener implements UndoableEditListener {
         public void undoableEditHappened(UndoableEditEvent e) {
-            um.addEdit(e.getEdit());
+            editmanager.addEdit(e.getEdit());
             undoAction.updateUndoState();
             redoAction.updateRedoState();
         }

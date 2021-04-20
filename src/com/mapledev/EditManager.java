@@ -10,13 +10,13 @@ import javax.swing.undo.CannotUndoException;
 import javax.swing.undo.UndoManager;
 
 public class EditManager extends UndoManager{
-    SmartUndoEditorGUI gui;
+    SmartUndoEditorGUI smartundoeditorgui;
 	
 	private static String copiedText;
 
-    public EditManager(SmartUndoEditorGUI gui) {
+    public EditManager(SmartUndoEditorGUI smartundoeditorgui) {
         super();
-        this.gui = gui;
+        this.smartundoeditorgui = smartundoeditorgui;
     }
 
     public static void cut(JTextPane content){
@@ -64,7 +64,7 @@ public class EditManager extends UndoManager{
                 ex.printStackTrace();
             }
             updateUndoState();
-            gui.redoAction.updateRedoState();
+            smartundoeditorgui.redoAction.updateRedoState();
         }
 
         public void updateUndoState(){
@@ -92,7 +92,7 @@ public class EditManager extends UndoManager{
                 ex.printStackTrace();
             }
             updateRedoState();
-            gui.undoAction.updateUndoState();
+            smartundoeditorgui.undoAction.updateUndoState();
         }
 
         public void updateRedoState() {
