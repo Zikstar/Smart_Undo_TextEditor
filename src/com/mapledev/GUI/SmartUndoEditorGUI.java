@@ -5,14 +5,7 @@ import com.mapledev.FileManager;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 
-import javax.swing.JFrame;
-import javax.swing.JMenu;
-import javax.swing.JMenuBar;
-import javax.swing.JMenuItem;
-import javax.swing.JPopupMenu;
-import javax.swing.JTextPane;
-import javax.swing.UIManager;
-import javax.swing.UnsupportedLookAndFeelException;
+import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
@@ -23,9 +16,6 @@ import java.awt.event.WindowEvent;
 import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.swing.Action;
-import javax.swing.BorderFactory;
-import javax.swing.JTextArea;
 import javax.swing.event.UndoableEditEvent;
 import javax.swing.event.UndoableEditListener;
 import javax.swing.text.AbstractDocument;
@@ -37,6 +27,7 @@ import javax.swing.text.StyledDocument;
 public class SmartUndoEditorGUI extends JFrame implements ActionListener{
     private static JTextPane area;
     private static JFrame frame;
+    private JScrollPane scrollPane;
     protected EditManager um = new EditManager(this);
     public EditManager.UndoAction undoAction;
     public EditManager.RedoAction redoAction;
@@ -103,10 +94,14 @@ public class SmartUndoEditorGUI extends JFrame implements ActionListener{
 
     private void setTheAttrOfAppWindow() {
         area = new JTextPane();
+
         area.getDocument().addDocumentListener(new MyDocumentListener());
-        frame.add(area);
-        frame.setSize(640, 480);
+        frame.setSize(640, 600);
         frame.setLocationRelativeTo(null);
+        scrollPane = new JScrollPane(area);
+        scrollPane.setBorder(BorderFactory.createEmptyBorder());
+        scrollPane.setMinimumSize(new Dimension(500,400));
+        frame.add(scrollPane);
         frame.setVisible(true);
         
         addListeners();
@@ -149,26 +144,7 @@ public class SmartUndoEditorGUI extends JFrame implements ActionListener{
         menu_file.add(menuitem_save_as);
         menu_file.add(menuitem_quit);
         
-        // Menu items for Insert
-        
-        JMenuItem menuitem_picture = new JMenuItem("Picture");
-        JMenuItem menuitem_table = new JMenuItem("Table");
-        JMenuItem menuitem_header = new JMenuItem("Header");
-        JMenuItem menuitem_footer = new JMenuItem("Footer");
-        
 
-        menuitem_picture.addActionListener(this);
-        menuitem_table.addActionListener(this);
-        menuitem_header.addActionListener(this);
-        menuitem_footer.addActionListener(this);
-
-        menu_main.add(menu_insert);
-
-        menu_insert.add(menuitem_picture);
-        menu_insert.add(menuitem_table);
-        menu_insert.add(menuitem_header);
-        menu_insert.add(menuitem_footer);
-        
         // Menu items for edit
         undoAction = um.new UndoAction();
         menu_edit.add(undoAction);
