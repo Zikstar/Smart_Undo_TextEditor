@@ -2,22 +2,23 @@ package com.mapledev.GUI;
 
 import com.mapledev.EditManager;
 import com.mapledev.FileManager;
-import java.awt.BorderLayout;
+import com.mapledev.Utils.ListDialog;
+
 import java.awt.Dimension;
 
 import javax.swing.*;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
+import javax.swing.event.*;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.swing.event.UndoableEditEvent;
-import javax.swing.event.UndoableEditListener;
 import javax.swing.text.AbstractDocument;
 import javax.swing.text.Document;
 import javax.swing.text.JTextComponent;
@@ -32,6 +33,7 @@ public class SmartUndoEditorGUI extends JFrame implements ActionListener{
     public EditManager.UndoAction undoAction;
     public EditManager.RedoAction redoAction;
     HashMap<Object, Action> actions;
+    private JList<String> jList;
     
     public SmartUndoEditorGUI(){
         run();
@@ -62,8 +64,10 @@ public class SmartUndoEditorGUI extends JFrame implements ActionListener{
         	
         } else if (actionCommand.contentEquals("Paste")) {
         	EditManager.paste(area);
-        	
-        } 
+        } else if (actionCommand.contentEquals("Undo From List")){
+            showUndoListDialog(EditManager.undoFromList(area));
+
+        }
        
     }
 
@@ -105,6 +109,39 @@ public class SmartUndoEditorGUI extends JFrame implements ActionListener{
         frame.setVisible(true);
         
         addListeners();
+    }
+
+    private void showUndoListDialog(String[] words){
+        if(words == null)
+            return;
+        String message = "Choose the words you want to undo";
+
+        jList = new JList<>(words);
+        ListDialog dialog = new ListDialog(message, jList);
+        dialog.setOnOk(e ->{
+            int [] selectedIndices = dialog.getSelectedIndices();
+            Set<Integer> selectedIndicesSet = new HashSet<>();
+            for (int selectedIndex : selectedIndices) {
+                selectedIndicesSet.add(selectedIndex);
+            }
+
+            ArrayList<String> newWordList = new ArrayList<>();
+            for (int i = 0; i < words.length; i++) {
+                if(!selectedIndicesSet.contains(i)){
+                    newWordList.add(words[i]);
+                }
+            }
+
+            refreshTextAreaWithNewWordList(newWordList);
+        });
+
+        dialog.show();
+
+    }
+
+    private void refreshTextAreaWithNewWordList(ArrayList<String> newWordList) {
+        System.out.println(newWordList);
+        area.setText(String.join(" ", newWordList));
     }
 
     private void setTheLookAndFeel() {
@@ -156,17 +193,20 @@ public class SmartUndoEditorGUI extends JFrame implements ActionListener{
         JMenuItem menuitem_copy = new JMenuItem("Copy");
         JMenuItem menuitem_cut = new JMenuItem("Cut");
         JMenuItem menuitem_paste = new JMenuItem("Paste");
+        JMenuItem menuitem_undolist = new JMenuItem("Undo From List");
         
         //menuitem_undo.addActionListener(this);
         menuitem_copy.addActionListener(this);
         menuitem_cut.addActionListener(this);
         menuitem_paste.addActionListener(this);
+        menuitem_undolist.addActionListener(this);
 
         menu_main.add(menu_edit);
         //menu_edit.add(menuitem_undo);
         menu_edit.add(menuitem_copy);
         menu_edit.add(menuitem_cut);
         menu_edit.add(menuitem_paste);
+        menu_edit.add(menuitem_undolist);
      
         return menu_main;
         

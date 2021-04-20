@@ -5,6 +5,8 @@ import java.awt.event.ActionEvent;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.JTextPane;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.Document;
 import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
 import javax.swing.undo.UndoManager;
@@ -49,7 +51,20 @@ public class EditManager extends UndoManager{
     	} else
     		return false;
     }
-    
+
+    public static String[] undoFromList(JTextPane area){
+        Document document = area.getDocument();
+        try {
+            String text = document.getText(0, document.getLength());
+            String[] WordsArr = text.split("\\s+");
+            return WordsArr;
+
+        }catch (BadLocationException ble){
+            ble.printStackTrace();
+        }
+        return null;
+    }
+
     public class UndoAction extends AbstractAction {
         public UndoAction() {
             super("Undo");
