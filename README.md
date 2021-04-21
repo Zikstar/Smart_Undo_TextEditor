@@ -1,4 +1,4 @@
-##Comp 5541 Concordia University Smart Undo Text Editor Project
+## Comp 5541 Concordia University Smart Undo Text Editor Project
 
 The following is the Smart Undo Text Editor Project for Group 6.
 
