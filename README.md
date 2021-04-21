@@ -1,6 +1,6 @@
 ## Comp 5541 Concordia University Smart Undo Text Editor Project
 
-The following is the Smart Undo Text Editor Project for Group 6.
+The following is the Smart Undo Text Editor Project for Group 4.
 
 All of the code for this Project is contained in the src folder.
 And it contains the root level package, which contains the:
