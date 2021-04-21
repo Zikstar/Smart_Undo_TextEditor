@@ -42,6 +42,12 @@ public class SmartUndoEditorGUI extends JFrame implements ActionListener{
     }
 
 
+    public SmartUndoEditorGUI(ActionEvent event){
+        run();
+        actionPerformed(event);
+    }
+
+
     @Override
     public void actionPerformed(ActionEvent actionEvent) {
         String actionCommand = actionEvent.getActionCommand();
@@ -82,7 +88,7 @@ public class SmartUndoEditorGUI extends JFrame implements ActionListener{
 
 
     public void run() {
-        frame = new JFrame("Smart Undo TextEditor");
+        frame = new JFrame("Smart Undo Text Editor");
         frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         
         frame.addWindowListener(new WindowAdapter() {
