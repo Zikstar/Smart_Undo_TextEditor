@@ -10,7 +10,7 @@ that houses all of the image assets used in this project
 
 - The Utils Package or Module
 
-- The Edit Manager class: Which contains all the functions and methods that perform
+- The Edit Manager Class: Which contains all the functions and methods that perform
 all the edit operations supported by our project including the Undo, Delete, Cut, Copy
 and Paste operations
 
