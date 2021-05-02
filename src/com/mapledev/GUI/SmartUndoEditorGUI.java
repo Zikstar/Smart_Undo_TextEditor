@@ -19,11 +19,6 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.swing.text.AbstractDocument;
-import javax.swing.text.Document;
-import javax.swing.text.JTextComponent;
-import javax.swing.text.StyledDocument;
-
 
 public class SmartUndoEditorGUI extends JFrame implements ActionListener{
     private static JTextPane area;
@@ -263,15 +258,7 @@ public class SmartUndoEditorGUI extends JFrame implements ActionListener{
         }
     }
 
-    
-    private HashMap<Object, Action> createActionTable(JTextComponent textComponent) {
-        HashMap<Object, Action> actions = new HashMap<Object, Action>();
-        Action[] actionsArray = textComponent.getActions();
-        for (Action a : actionsArray) {
-            actions.put(a.getValue(Action.NAME), a);
-        }
-        return actions;
-    }
+
     
     public void addListeners(){
         area.getDocument().addUndoableEditListener(new MyUndoableEditListener());
